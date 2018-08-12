@@ -16,7 +16,7 @@ def index():
 
 @app.route('/instant_color/<red>/<green>/<blue>')
 def instant_color(red, green, blue):
-    rgb.instant_color(color=None, r=int(red), g=int(green), b=int(blue))
+    rgb.instant_color(int(red), int(green), int(blue))
     return '(' + red + ',' + green + ',' + blue + ')'
 
 
@@ -32,10 +32,34 @@ def rainbow():
     return 'rainbow'
 
 
+@app.route('/voltage_drop')
+def voltage_drop():
+    start_process(rgb.voltage_drop)
+    return 'voltage_drop'
+
+
 @app.route('/rainbow_color_wipe')
 def rainbow_color_wipe():
     start_process(rgb.rainbow_color_wipe)
     return 'rainbow_color_wipe'
+
+
+@app.route('/rainbow_fade')
+def rainbow_fade():
+    start_process(rgb.rainbow_fade)
+    return 'rainbow_fade'
+
+
+@app.route('/random_fade')
+def random_fade():
+    start_process(rgb.random_fade)
+    return 'random_fade'
+
+
+@app.route('/strobe')
+def strobe():
+    start_process(rgb.strobe)
+    return 'strobe'
 
 
 @app.route('/clear')
@@ -60,3 +84,5 @@ def stop_process():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+
+# TODO: Clear on exit
