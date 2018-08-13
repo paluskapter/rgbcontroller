@@ -1,9 +1,9 @@
-from random import randint
 from time import sleep
 
 from webcolors import name_to_rgb
 
-from neopixel import Adafruit_NeoPixel, Color
+from neopixel import Adafruit_NeoPixel
+from util import *
 
 
 class RGBController:
@@ -46,38 +46,22 @@ class RGBController:
             self.color_wipe(Color(255, 0, 255), 10)
             self.color_wipe(Color(255, 0, 127), 10)
 
-    def wheel(self, pos):
-        """Generate rainbow colors across 0-255 positions."""
-        if pos < 85:
-            return Color(pos * 3, 255 - pos * 3, 0)
-        elif pos < 170:
-            pos -= 85
-            return Color(255 - pos * 3, 0, pos * 3)
-        else:
-            pos -= 170
-            return Color(0, pos * 3, 255 - pos * 3)
-
-    def transition_transform(self, pos, c1, c2, pixels):
-        # vrescaled = (v - min(v)) * (newupper - newlower) / (max(v) - min(v)) + newlower
-        r = int(pos * (c2[0] - c1[0]) / pixels + float(c1[0]))
-        g = int(pos * (c2[1] - c1[1]) / pixels + float(c1[1]))
-        b = int(pos * (c2[2] - c1[2]) / pixels + float(c1[2]))
-        return Color(r, g, b)
-
-    def transition(self, c1, c2):
+    def gradient(self, c1, c2):
+        """Gradient between 2 colors."""
         for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, self.transition_transform(i, c1, c2, self.strip.numPixels()))
+            self.strip.setPixelColor(i, gradient_color(i, c1, c2, self.strip.numPixels()))
         self.strip.show()
 
     def voltage_drop(self):
-        self.transition((255, 255, 255), (255, 50, 0))
+        """Voltage drop effect (white to orange)"""
+        self.gradient((255, 255, 255), (255, 50, 0))
 
     def rainbow(self, wait_ms=20, iterations=1):
         """Draw rainbow that fades across all pixels at once."""
         while True:
             for j in range(256 * iterations):
                 for i in range(self.strip.numPixels()):
-                    self.strip.setPixelColor(i, self.wheel((i + j) & 255))
+                    self.strip.setPixelColor(i, wheel((i + j) & 255))
                 self.strip.show()
                 sleep(wait_ms / 1000.0)
 
@@ -122,6 +106,7 @@ class RGBController:
         return [self.strip.getPixelColor(i) for i in range(self.strip.numPixels())]
 
     def rainbow_fade(self):
+        """Goes through all the colors (every led is the same color)"""
         r = 255
         g = 0
         b = 0
@@ -146,21 +131,15 @@ class RGBController:
                 self.instant_color(r, g, b, 0.01)
 
     def random_fade(self):
-        old_r, old_g, old_b = self.random_color()
+        """Randomly fades between colors."""
+        old_r, old_g, old_b = random_color()
 
         self.instant_color(old_r, old_g, old_b)
 
-        new_r, new_g, new_b = self.random_color()
+        new_r, new_g, new_b = random_color()
         # TODO: continue
 
-    def random_color(self):
-        while True:
-            r = randint(0, 255)
-            g = randint(0, 255)
-            b = randint(0, 255)
-            if r + g + b < 510:
-                return r, g, b
-
     def strobe(self):
+        """Strobe effect."""
         pass
         # TODO: continue

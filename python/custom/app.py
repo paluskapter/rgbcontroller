@@ -38,6 +38,12 @@ def voltage_drop():
     return 'voltage_drop'
 
 
+@app.route('/gradient/<r1>/<g1>/<b1>/<r2>/<g2>/<b2>')
+def gradient(r1, g1, b1, r2, g2, b2):
+    rgb.gradient((int(r1), int(g1), int(b1)), (int(r2), int(g2), int(b2)))
+    return 'gradient'
+
+
 @app.route('/rainbow_color_wipe')
 def rainbow_color_wipe():
     start_process(rgb.rainbow_color_wipe)
