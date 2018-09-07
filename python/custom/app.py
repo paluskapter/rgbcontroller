@@ -11,7 +11,19 @@ proc = None
 
 @app.route('/')
 def index():
-    return 'Hello world, I am PI'
+    return 'Rasberry Pi RGB strip controller'
+
+
+@app.route('/clear')
+def clear():
+    rgb.clear()
+    return 'clear'
+
+
+@app.route('/gradient/<r1>/<g1>/<b1>/<r2>/<g2>/<b2>')
+def gradient(r1, g1, b1, r2, g2, b2):
+    rgb.gradient((int(r1), int(g1), int(b1)), (int(r2), int(g2), int(b2)))
+    return 'gradient'
 
 
 @app.route('/instant_color/<red>/<green>/<blue>')
@@ -30,18 +42,6 @@ def instant_color_name(name):
 def rainbow():
     start_process(rgb.rainbow)
     return 'rainbow'
-
-
-@app.route('/voltage_drop')
-def voltage_drop():
-    start_process(rgb.voltage_drop)
-    return 'voltage_drop'
-
-
-@app.route('/gradient/<r1>/<g1>/<b1>/<r2>/<g2>/<b2>')
-def gradient(r1, g1, b1, r2, g2, b2):
-    rgb.gradient((int(r1), int(g1), int(b1)), (int(r2), int(g2), int(b2)))
-    return 'gradient'
 
 
 @app.route('/rainbow_color_wipe')
@@ -68,10 +68,10 @@ def strobe(wait):
     return 'strobe'
 
 
-@app.route('/clear')
-def clear():
-    rgb.clear()
-    return 'clear'
+@app.route('/voltage_drop')
+def voltage_drop():
+    start_process(rgb.voltage_drop)
+    return 'voltage_drop'
 
 
 def start_process(func, args=()):
@@ -91,5 +91,5 @@ def stop_process():
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
 
-# TODO: Clear on exit
 # TODO: Error handling
+# TODO: Voice commands

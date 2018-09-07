@@ -23,6 +23,10 @@ class RGBController:
                                        LED_BRIGHTNESS, LED_CHANNEL, STRIP_TYPE)
         self.strip.begin()
 
+    def clear(self):
+        """Clears the strip one by one."""
+        self.color_wipe(Color(0, 0, 0))
+
     def color_wipe(self, color, wait_ms=0):
         """Wipe color across display a pixel at a time."""
         for i in range(self.strip.numPixels()):
@@ -30,44 +34,11 @@ class RGBController:
             self.strip.show()
             sleep(wait_ms / 1000.0)
 
-    def rainbow_color_wipe(self):
-        """Wipe 12 colors across display a pixel at a time."""
-        while True:
-            self.color_wipe(Color(255, 0, 0), 10)
-            self.color_wipe(Color(255, 127, 0), 10)
-            self.color_wipe(Color(255, 255, 0), 10)
-            self.color_wipe(Color(127, 255, 0), 10)
-            self.color_wipe(Color(0, 255, 0), 10)
-            self.color_wipe(Color(0, 255, 127), 10)
-            self.color_wipe(Color(0, 255, 255), 10)
-            self.color_wipe(Color(0, 127, 255), 10)
-            self.color_wipe(Color(0, 0, 255), 10)
-            self.color_wipe(Color(127, 0, 255), 10)
-            self.color_wipe(Color(255, 0, 255), 10)
-            self.color_wipe(Color(255, 0, 127), 10)
-
     def gradient(self, c1, c2):
         """Gradient between 2 colors."""
         for i in range(self.strip.numPixels()):
             self.strip.setPixelColor(i, gradient_color(i, c1, c2, self.strip.numPixels()))
         self.strip.show()
-
-    def voltage_drop(self):
-        """Voltage drop effect (white to orange)"""
-        self.gradient((255, 255, 255), (255, 50, 0))
-
-    def rainbow(self, wait_ms=20, iterations=1):
-        """Draw rainbow that fades across all pixels at once."""
-        while True:
-            for j in range(256 * iterations):
-                for i in range(self.strip.numPixels()):
-                    self.strip.setPixelColor(i, wheel((i + j) & 255))
-                self.strip.show()
-                sleep(wait_ms / 1000.0)
-
-    def clear(self):
-        """Clears the strip one by one."""
-        self.color_wipe(Color(0, 0, 0))
 
     def instant_color(self, r, g, b, wait=0.0):
         """Instantly switches color."""
@@ -88,6 +59,10 @@ class RGBController:
         except ValueError:
             self.show_error()
 
+    def save_pixels(self):
+        """Saves current pixel colors"""
+        return [self.strip.getPixelColor(i) for i in range(self.strip.numPixels())]
+
     def show_error(self):
         """Flashes red twice."""
         colors = self.save_pixels()
@@ -101,9 +76,36 @@ class RGBController:
         sleep(0.1)
         self.instant_color_array(colors)
 
-    def save_pixels(self):
-        """Saves current pixel colors"""
-        return [self.strip.getPixelColor(i) for i in range(self.strip.numPixels())]
+    def strobe(self, wait):
+        """Strobe effect."""
+        while True:
+            r, g, b = random_color()
+            self.instant_color(r, g, b, wait)
+
+    def rainbow_color_wipe(self):
+        """Wipe 12 colors across display a pixel at a time."""
+        while True:
+            self.color_wipe(Color(255, 0, 0), 10)
+            self.color_wipe(Color(255, 127, 0), 10)
+            self.color_wipe(Color(255, 255, 0), 10)
+            self.color_wipe(Color(127, 255, 0), 10)
+            self.color_wipe(Color(0, 255, 0), 10)
+            self.color_wipe(Color(0, 255, 127), 10)
+            self.color_wipe(Color(0, 255, 255), 10)
+            self.color_wipe(Color(0, 127, 255), 10)
+            self.color_wipe(Color(0, 0, 255), 10)
+            self.color_wipe(Color(127, 0, 255), 10)
+            self.color_wipe(Color(255, 0, 255), 10)
+            self.color_wipe(Color(255, 0, 127), 10)
+
+    def rainbow(self, wait_ms=20, iterations=1):
+        """Draw rainbow that fades across all pixels at once."""
+        while True:
+            for j in range(256 * iterations):
+                for i in range(self.strip.numPixels()):
+                    self.strip.setPixelColor(i, wheel((i + j) & 255))
+                self.strip.show()
+                sleep(wait_ms / 1000.0)
 
     def rainbow_fade(self):
         """Goes through all the colors (every led is the same color)"""
@@ -157,10 +159,6 @@ class RGBController:
                     old_b = (old_b - 1) if dist_b > 0 else old_b + 1
                 self.instant_color(old_r, old_g, old_b, 0.01)
 
-    def strobe(self, wait):
-        """Strobe effect."""
-        while True:
-            r, g, b = random_color()
-            self.instant_color(r, g, b, wait)
-
-# TODO: dimming
+    def voltage_drop(self):
+        """Voltage drop effect (white to orange)"""
+        self.gradient((255, 255, 255), (255, 50, 0))
