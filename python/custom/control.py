@@ -133,13 +133,34 @@ class RGBController:
     def random_fade(self):
         """Randomly fades between colors."""
         old_r, old_g, old_b = random_color()
-
         self.instant_color(old_r, old_g, old_b)
 
-        new_r, new_g, new_b = random_color()
-        # TODO: continue
+        while True:
+            new_r, new_g, new_b = random_color()
 
-    def strobe(self):
+            dist_r = old_r - new_r
+            dist_g = old_g - new_g
+            dist_b = old_b - new_b
+
+            steps = max(abs(dist_r), abs(dist_g), abs(dist_b))
+
+            step_r = (steps / float(abs(dist_r))) if dist_r != 0 else 999
+            step_g = (steps / float(abs(dist_g))) if dist_g != 0 else 999
+            step_b = (steps / float(abs(dist_b))) if dist_b != 0 else 999
+
+            for i in range(1, steps + 1):
+                if i % step_r < 1:
+                    old_r = (old_r - 1) if dist_r > 0 else old_r + 1
+                if i % step_g < 1:
+                    old_g = (old_g - 1) if dist_g > 0 else old_g + 1
+                if i % step_b < 1:
+                    old_b = (old_b - 1) if dist_b > 0 else old_b + 1
+                self.instant_color(old_r, old_g, old_b, 0.01)
+
+    def strobe(self, wait):
         """Strobe effect."""
-        pass
-        # TODO: continue
+        while True:
+            r, g, b = random_color()
+            self.instant_color(r, g, b, wait)
+
+# TODO: dimming

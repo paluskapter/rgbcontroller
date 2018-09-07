@@ -62,9 +62,9 @@ def random_fade():
     return 'random_fade'
 
 
-@app.route('/strobe')
-def strobe():
-    start_process(rgb.strobe)
+@app.route('/strobe/<wait>')
+def strobe(wait):
+    start_process(rgb.strobe, (float(wait),))
     return 'strobe'
 
 
@@ -92,3 +92,4 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
 
 # TODO: Clear on exit
+# TODO: Error handling

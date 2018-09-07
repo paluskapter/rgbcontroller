@@ -1,4 +1,5 @@
-from random import randint
+from colorsys import hls_to_rgb
+from random import random
 
 from neopixel import Color
 
@@ -25,9 +26,4 @@ def gradient_color(pos, c1, c2, pixels):
 
 def random_color():
     """Random color generator."""
-    while True:
-        r = randint(0, 255)
-        g = randint(0, 255)
-        b = randint(0, 255)
-        if r + g + b < 510:
-            return r, g, b
+    return [int(255 * x) for x in hls_to_rgb(random(), 0.5, 1)]
