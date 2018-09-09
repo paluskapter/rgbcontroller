@@ -20,6 +20,18 @@ def clear():
     return 'clear'
 
 
+@app.route('/comet')
+def comet():
+    start_process(rgb.comet)
+    return 'comet'
+
+
+@app.route('/fire')
+def fire():
+    start_process(rgb.fire)
+    return 'fire'
+
+
 @app.route('/gradient/<r1>/<g1>/<b1>/<r2>/<g2>/<b2>')
 def gradient(r1, g1, b1, r2, g2, b2):
     rgb.gradient((int(r1), int(g1), int(b1)), (int(r2), int(g2), int(b2)))
@@ -36,6 +48,12 @@ def instant_color(red, green, blue):
 def instant_color_name(name):
     rgb.instant_color_name(name)
     return name
+
+
+@app.route('/music')
+def music():
+    start_process(rgb.music)
+    return 'music'
 
 
 @app.route('/rainbow')
@@ -62,9 +80,21 @@ def random_fade():
     return 'random_fade'
 
 
+@app.route('/snake')
+def snake():
+    start_process(rgb.snake)
+    return 'snake'
+
+
+@app.route('/snake_rainbow')
+def snake_rainbow():
+    start_process(rgb.snake_rainbow)
+    return 'snake_rainbow'
+
+
 @app.route('/strobe/<wait>')
 def strobe(wait):
-    start_process(rgb.strobe, (float(wait),))
+    start_process(rgb.strobe, (int(wait),))
     return 'strobe'
 
 

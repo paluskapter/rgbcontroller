@@ -1,7 +1,16 @@
 from colorsys import hls_to_rgb
 from random import random
+from time import sleep
 
 from neopixel import Color
+
+
+def color_wipe(strip, color, wait_ms=0):
+    """Wipe color across display a pixel at a time."""
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, color)
+        strip.show()
+        sleep(wait_ms / 1000.0)
 
 
 def gradient_color(pos, c1, c2, pixels):
@@ -12,9 +21,22 @@ def gradient_color(pos, c1, c2, pixels):
     return Color(r, g, b)
 
 
+def instant_color_array(strip, color, wait_ms=0):
+    """Instantly switches color from an array of colors."""
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, color[i])
+    strip.show()
+    sleep(wait_ms / 1000.0)
+
+
 def random_color():
     """Random color generator."""
     return [int(255 * x) for x in hls_to_rgb(random(), 0.5, 1)]
+
+
+def save_pixels(strip):
+    """Saves current pixel colors"""
+    return [strip.getPixelColor(i) for i in range(strip.numPixels())]
 
 
 def wheel(pos):
