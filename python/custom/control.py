@@ -1,3 +1,5 @@
+from random import randint
+
 from webcolors import name_to_rgb
 
 from neopixel import Adafruit_NeoPixel
@@ -23,7 +25,8 @@ class RGBController:
 
     def clear(self):
         """Clears the strip one by one."""
-        color_wipe(self.strip, Color(0, 0, 0), 1)
+        self.instant_color(16, 16, 16)
+        color_wipe(self.strip, Color(0, 0, 0))
 
     def comet(self):
         """Comet effect."""
@@ -32,8 +35,14 @@ class RGBController:
 
     def fire(self):
         """Fire effect."""
-        # TODO: Implement
-        pass
+        while True:
+            for i in range(self.strip.numPixels()):
+                self.strip.setPixelColor(i, Color(
+                    randint(180, 255),
+                    randint(10, 60) if random() > 0.7 else 0,
+                    0))
+            self.strip.show()
+            sleep(randint(100, 200) / 1000.0)
 
     def gradient(self, c1, c2):
         """Gradient between 2 colors."""
@@ -58,10 +67,10 @@ class RGBController:
         # TODO: Implement
         pass
 
-    def rainbow(self, wait_ms=20, iterations=1):
+    def rainbow(self, wait_ms=0):
         """Draw rainbow that fades across all pixels at once."""
         while True:
-            for j in range(256 * iterations):
+            for j in range(256):
                 for i in range(self.strip.numPixels()):
                     self.strip.setPixelColor(i, wheel((i + j) & 255))
                 self.strip.show()
