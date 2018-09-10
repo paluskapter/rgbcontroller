@@ -36,11 +36,15 @@ class RGBController:
     def fire(self):
         """Fire effect."""
         while True:
-            for i in range(self.strip.numPixels()):
+            for i in range(40) + range(self.strip.numPixels() - 25, self.strip.numPixels()):
+                self.strip.setPixelColor(i, Color(randint(180, 255), 0, 0))
+
+            for i in range(40, self.strip.numPixels() - 25):
                 self.strip.setPixelColor(i, Color(
                     randint(180, 255),
-                    randint(10, 60) if random() > 0.7 else 0,
+                    randint(10, 50) if random() > 0.7 else 0,
                     0))
+
             self.strip.show()
             sleep(randint(100, 200) / 1000.0)
 
