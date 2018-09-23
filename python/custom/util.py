@@ -4,6 +4,21 @@ from time import sleep
 
 from neopixel import Color
 
+rainbow = [
+    Color(255, 0, 0),
+    Color(255, 127, 0),
+    Color(255, 255, 0),
+    Color(127, 255, 0),
+    Color(0, 255, 0),
+    Color(0, 255, 127),
+    Color(0, 255, 255),
+    Color(0, 127, 255),
+    Color(0, 0, 255),
+    Color(127, 0, 255),
+    Color(255, 0, 255),
+    Color(255, 0, 127),
+]
+
 
 def color_wipe(strip, color, wait_ms=0):
     """Wipe color across display a pixel at a time."""

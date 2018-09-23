@@ -1,3 +1,4 @@
+import itertools
 from random import randint
 
 from webcolors import name_to_rgb
@@ -82,19 +83,8 @@ class RGBController:
 
     def rainbow_color_wipe(self):
         """Wipe 12 colors across display a pixel at a time."""
-        while True:
-            color_wipe(self.strip, Color(255, 0, 0), 10)
-            color_wipe(self.strip, Color(255, 127, 0), 10)
-            color_wipe(self.strip, Color(255, 255, 0), 10)
-            color_wipe(self.strip, Color(127, 255, 0), 10)
-            color_wipe(self.strip, Color(0, 255, 0), 10)
-            color_wipe(self.strip, Color(0, 255, 127), 10)
-            color_wipe(self.strip, Color(0, 255, 255), 10)
-            color_wipe(self.strip, Color(0, 127, 255), 10)
-            color_wipe(self.strip, Color(0, 0, 255), 10)
-            color_wipe(self.strip, Color(127, 0, 255), 10)
-            color_wipe(self.strip, Color(255, 0, 255), 10)
-            color_wipe(self.strip, Color(255, 0, 127), 10)
+        for color in itertools.cycle(rainbow):
+            color_wipe(self.strip, color, 10)
 
     def rainbow_fade(self):
         """Goes through all the colors (every led is the same color)"""
@@ -150,8 +140,30 @@ class RGBController:
 
     def snake(self):
         """Snake with changing color."""
-        # TODO: Implement
-        pass
+        start = 0
+        length = 35
+        direction = False
+        count = itertools.count()
+        color = None
+
+        while True:
+            if start == self.strip.numPixels() - length or start == 0:
+                direction = not direction
+                color = rainbow[count.next() % 12]
+
+            for i in range(start) + range(start + length, self.strip.numPixels()):
+                self.strip.setPixelColor(i, Color(0, 0, 0))
+
+            for i in range(start, start + length):
+                self.strip.setPixelColor(i, color)
+
+            if direction:
+                start += 1
+            else:
+                start -= 1
+
+            self.strip.show()
+            sleep(0.01)
 
     def snake_rainbow(self):
         """Rainbow snake effect."""
