@@ -29,11 +29,6 @@ class RGBController:
         self.instant_color(16, 16, 16)
         color_wipe(self.strip, Color(0, 0, 0))
 
-    def comet(self):
-        """Comet effect."""
-        # TODO: Implement
-        pass
-
     def fire(self):
         """Fire effect."""
         while True:
@@ -141,7 +136,7 @@ class RGBController:
     def snake(self):
         """Snake with changing color."""
         start = 0
-        length = 35
+        length = 36
         direction = False
         count = itertools.count()
         color = None
@@ -167,8 +162,27 @@ class RGBController:
 
     def snake_rainbow(self):
         """Rainbow snake effect."""
-        # TODO: Implement
-        pass
+        start = 0
+        length = 48
+        direction = False
+
+        while True:
+            if start == self.strip.numPixels() - length or start == 0:
+                direction = not direction
+
+            for i in range(start) + range(start + length, self.strip.numPixels()):
+                self.strip.setPixelColor(i, Color(0, 0, 0))
+
+            for i in range(start, start + length):
+                self.strip.setPixelColor(i, rainbow[(i - start) / 4])
+
+            if direction:
+                start += 1
+            else:
+                start -= 1
+
+            self.strip.show()
+            sleep(0.01)
 
     def strobe(self, wait_ms):
         """Strobe effect."""

@@ -20,12 +20,6 @@ def clear():
     return 'clear'
 
 
-@app.route('/comet')
-def comet():
-    start_process(rgb.comet)
-    return 'comet'
-
-
 @app.route('/fire')
 def fire():
     start_process(rgb.fire)
