@@ -1,7 +1,6 @@
 import itertools
 from random import randint
 
-from multipledispatch import dispatch
 from webcolors import name_to_rgb
 
 from neopixel import Adafruit_NeoPixel
@@ -27,7 +26,7 @@ class RGBController:
 
     def clear(self):
         """Clears the strip one by one."""
-        self.instant_color(16, 16, 16)
+        self.static_color(16, 16, 16)
         color_wipe(self.strip, Color(0, 0, 0))
 
     def fire(self):
@@ -45,59 +44,36 @@ class RGBController:
             self.strip.show()
             sleep(randint(100, 200) / 1000.0)
 
-    def gradient(self, c1, c2):
-        """Gradient between 2 colors."""
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, gradient_color(i, c1, c2, self.strip.numPixels()))
-        self.strip.show()
-
-    @dispatch(int, int, int)
-    def instant_color(self, r, g, b, wait_ms=0):
-        """Instantly switches color."""
-        instant_color_array(self.strip, [Color(r, g, b)] * self.strip.numPixels(), wait_ms)
-
-    @dispatch(object)
-    def instant_color(self, c, wait_ms=0):
-        """Instantly switches color."""
-        instant_color_array(self.strip, [c] * self.strip.numPixels(), wait_ms)
-
-    def instant_color_name(self, name, wait_ms=0):
-        """Instantly switches color from a color name."""
-        try:
-            rgb = name_to_rgb(name)
-            self.instant_color(rgb.red, rgb.green, rgb.blue, wait_ms)
-        except ValueError:
-            self.show_error()
-
     def music(self):
         """Lights according to music."""
         # TODO: Implement
         pass
 
     def rainbow(self, wait_ms=0):
-        """Draw rainbow that fades across all pixels at once."""
+        """Whole rainbow moves across the strip."""
         while True:
             for j in range(256):
                 for i in range(self.strip.numPixels()):
-                    self.strip.setPixelColor(i, wheel((i + j) & 255))
+                    self.strip.setPixelColor(i, rainbow_wheel((i + j) & 255))
                 self.strip.show()
                 sleep(wait_ms / 1000.0)
 
     def rainbow_color_wipe(self):
         """Wipe 12 colors across display a pixel at a time."""
-        for color in itertools.cycle(rainbow):
+        for color in itertools.cycle(RAINBOW):
             color_wipe(self.strip, color, 10)
 
     def rainbow_fade(self):
-        """Goes through all the colors (every led is the same color)"""
-        color = gradient_rainbow()
+        """Fades between all the colors in the rainbow."""
+        color_generator = rainbow_color_generator()
         while True:
-            self.instant_color(color.next(), 10)
+            c = color_generator.next()
+            self.static_color(c[0], c[1], c[2], 10)
 
     def random_fade(self):
         """Randomly fades between colors."""
         old_r, old_g, old_b = random_color()
-        self.instant_color(old_r, old_g, old_b)
+        self.static_color(old_r, old_g, old_b)
 
         while True:
             new_r, new_g, new_b = random_color()
@@ -119,25 +95,34 @@ class RGBController:
                     old_g = (old_g - 1) if dist_g > 0 else old_g + 1
                 if i % step_b < 1:
                     old_b = (old_b - 1) if dist_b > 0 else old_b + 1
-                self.instant_color(old_r, old_g, old_b, 10)
+                self.static_color(old_r, old_g, old_b, 10)
 
-    def snake(self):
-        """Snake with changing color."""
+    def snake(self, method=1):
+        """
+        Snake implementation. Methods:
+        1 = color
+        2 = fade
+        3 = rainbow
+        """
         start = 0
-        length = 36
+        length = 48
         direction = False
         count = itertools.count()
-        color = None
-
+        normal_color = None
+        fade_color_gen = rainbow_color_generator()
         while True:
+            r, g, b = fade_color_gen.next()
+            fade_color = Color(r, g, b)
+
             if start == self.strip.numPixels() - length or start == 0:
                 direction = not direction
-                color = rainbow[count.next() % 12]
+                normal_color = RAINBOW[count.next() % 12]
 
             for i in range(start) + range(start + length, self.strip.numPixels()):
                 self.strip.setPixelColor(i, Color(0, 0, 0))
 
             for i in range(start, start + length):
+                color = normal_color if method == 1 else fade_color if method == 2 else RAINBOW[(i - start) / 4]
                 self.strip.setPixelColor(i, color)
 
             if direction:
@@ -148,75 +133,55 @@ class RGBController:
             self.strip.show()
             sleep(0.01)
 
-    def snake_gradient(self):
+    def snake_color(self):
+        """Snake with changing color."""
+        self.snake(1)
+
+    def snake_fade(self):
         """Snake with continuously changing color."""
-        start = 0
-        length = 36
-        direction = False
-        color_generator = gradient_rainbow()
-
-        while True:
-            c = color_generator.next()
-            if start == self.strip.numPixels() - length or start == 0:
-                direction = not direction
-
-            for i in range(start) + range(start + length, self.strip.numPixels()):
-                self.strip.setPixelColor(i, Color(0, 0, 0))
-
-            for i in range(start, start + length):
-                self.strip.setPixelColor(i, c)
-
-            if direction:
-                start += 1
-            else:
-                start -= 1
-
-            self.strip.show()
-            sleep(0.01)
+        self.snake(2)
 
     def snake_rainbow(self):
-        """Rainbow snake effect."""
-        start = 0
-        length = 48
-        direction = False
+        """Snake with the whole rainbow."""
+        self.snake(3)
 
-        while True:
-            if start == self.strip.numPixels() - length or start == 0:
-                direction = not direction
+    def static_color(self, r, g, b, wait_ms=0):
+        """Switches color of the whole strip."""
+        static_color_array(self.strip, [Color(r, g, b)] * self.strip.numPixels(), wait_ms)
 
-            for i in range(start) + range(start + length, self.strip.numPixels()):
-                self.strip.setPixelColor(i, Color(0, 0, 0))
+    def static_color_name(self, name, wait_ms=0):
+        """Switches color of the whole strip by name."""
+        try:
+            rgb = name_to_rgb(name)
+            self.static_color(rgb.red, rgb.green, rgb.blue, wait_ms)
+        except ValueError:
+            self.show_error()
 
-            for i in range(start, start + length):
-                self.strip.setPixelColor(i, rainbow[(i - start) / 4])
-
-            if direction:
-                start += 1
-            else:
-                start -= 1
-
-            self.strip.show()
-            sleep(0.01)
+    def static_gradient(self, c1, c2):
+        """Gradient between 2 colors."""
+        for i in range(self.strip.numPixels()):
+            self.strip.setPixelColor(i, gradient_color(i, c1, c2, self.strip.numPixels()))
+        self.strip.show()
 
     def strobe(self, wait_ms):
         """Strobe effect."""
         while True:
             r, g, b = random_color()
-            self.instant_color(r, g, b, wait_ms)
+            self.static_color(r, g, b, wait_ms)
 
-    def voltage_drop(self):
+    def static_voltage_drop(self):
         """Voltage drop effect (white to orange)"""
-        self.gradient((255, 255, 255), (255, 50, 0))
+        self.static_gradient((255, 255, 255), (255, 50, 0))
 
     def show_error(self):
         """Flashes red twice."""
         colors = save_pixels(self.strip)
         for i in range(2):
-            self.instant_color(0, 0, 0)
+            self.static_color(0, 0, 0)
             sleep(0.1)
-            self.instant_color(255, 0, 0)
+            self.static_color(255, 0, 0)
             sleep(0.1)
 
-            self.instant_color(0, 0, 0)
+        self.static_color(0, 0, 0)
         sleep(0.1)
-        instant_color_array(self.strip, colors)
+        static_color_array(self.strip, colors)

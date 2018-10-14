@@ -11,7 +11,7 @@ proc = None
 
 @app.route('/')
 def index():
-    return 'Rasberry Pi RGB strip controller'
+    return 'Raspberry Pi RGB strip controller'
 
 
 @app.route('/clear')
@@ -24,24 +24,6 @@ def clear():
 def fire():
     start_process(rgb.fire)
     return 'fire'
-
-
-@app.route('/gradient/<r1>/<g1>/<b1>/<r2>/<g2>/<b2>')
-def gradient(r1, g1, b1, r2, g2, b2):
-    rgb.gradient((int(r1), int(g1), int(b1)), (int(r2), int(g2), int(b2)))
-    return 'gradient'
-
-
-@app.route('/instant_color/<red>/<green>/<blue>')
-def instant_color(red, green, blue):
-    rgb.instant_color(int(red), int(green), int(blue))
-    return '(' + red + ',' + green + ',' + blue + ')'
-
-
-@app.route('/instant_color_name/<name>')
-def instant_color_name(name):
-    rgb.instant_color_name(name)
-    return name
 
 
 @app.route('/music')
@@ -74,16 +56,16 @@ def random_fade():
     return 'random_fade'
 
 
-@app.route('/snake')
-def snake():
-    start_process(rgb.snake)
-    return 'snake'
+@app.route('/snake_color')
+def snake_color():
+    start_process(rgb.snake_color)
+    return 'snake_color'
 
 
-@app.route('/snake_gradient')
-def snake_gradient():
-    start_process(rgb.snake_gradient)
-    return 'snake_gradient'
+@app.route('/snake_fade')
+def snake_fade():
+    start_process(rgb.snake_fade)
+    return 'snake_fade'
 
 
 @app.route('/snake_rainbow')
@@ -92,16 +74,43 @@ def snake_rainbow():
     return 'snake_rainbow'
 
 
+@app.route('/static_color/<red>/<green>/<blue>')
+def static_color(red, green, blue):
+    try:
+        rgb.static_color(int(red), int(green), int(blue))
+    except ValueError:
+        rgb.show_error()
+    return 'static_color'
+
+
+@app.route('/static_color_name/<name>')
+def static_color_name(name):
+    rgb.static_color_name(name)
+    return 'static_color_name'
+
+
+@app.route('/static_gradient/<r1>/<g1>/<b1>/<r2>/<g2>/<b2>')
+def gradient(r1, g1, b1, r2, g2, b2):
+    try:
+        rgb.static_gradient((int(r1), int(g1), int(b1)), (int(r2), int(g2), int(b2)))
+    except ValueError:
+        rgb.show_error()
+    return 'static_gradient'
+
+
+@app.route('/static_voltage_drop')
+def static_voltage_drop():
+    rgb.static_voltage_drop()
+    return 'static_voltage_drop'
+
+
 @app.route('/strobe/<wait>')
 def strobe(wait):
-    start_process(rgb.strobe, (int(wait),))
+    try:
+        start_process(rgb.strobe, (int(wait),))
+    except ValueError:
+        rgb.show_error()
     return 'strobe'
-
-
-@app.route('/voltage_drop')
-def voltage_drop():
-    start_process(rgb.voltage_drop)
-    return 'voltage_drop'
 
 
 def start_process(func, args=()):
@@ -121,5 +130,4 @@ def stop_process():
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
 
-# TODO: Error handling
 # TODO: Voice commands

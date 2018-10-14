@@ -4,7 +4,7 @@ from time import sleep
 
 from neopixel import Color
 
-rainbow = [
+RAINBOW = [
     Color(255, 0, 0),
     Color(255, 127, 0),
     Color(255, 255, 0),
@@ -30,60 +30,42 @@ def color_wipe(strip, color, wait_ms=0):
 
 def gradient_color(pos, c1, c2, pixels):
     """Calculates the color for a given pixel in a gradient effect."""
-    r = int(pos * (c2[0] - c1[0]) / pixels + float(c1[0]))
-    g = int(pos * (c2[1] - c1[1]) / pixels + float(c1[1]))
-    b = int(pos * (c2[2] - c1[2]) / pixels + float(c1[2]))
-    return Color(r, g, b)
+    return Color(
+        int(pos * (c2[0] - c1[0]) / pixels + float(c1[0])),
+        int(pos * (c2[1] - c1[1]) / pixels + float(c1[1])),
+        int(pos * (c2[2] - c1[2]) / pixels + float(c1[2])))
 
 
-def gradient_rainbow():
+def rainbow_color_generator():
     """Returns an iterator with all the rainbow colors."""
     r = 255
     g = 0
     b = 0
 
-    yield Color(r, g, b)
+    yield (r, g, b)
 
     while True:
         for i in range(255):
             g += 1
-            yield Color(r, g, b)
+            yield (r, g, b)
         for i in range(255):
             r -= 1
-            yield Color(r, g, b)
+            yield (r, g, b)
         for i in range(255):
             b += 1
-            yield Color(r, g, b)
+            yield (r, g, b)
         for i in range(255):
             g -= 1
-            yield Color(r, g, b)
+            yield (r, g, b)
         for i in range(255):
             r += 1
-            yield Color(r, g, b)
+            yield (r, g, b)
         for i in range(255):
             b -= 1
-            yield Color(r, g, b)
+            yield (r, g, b)
 
 
-def instant_color_array(strip, color, wait_ms=0):
-    """Instantly switches color from an array of colors."""
-    for i in range(strip.numPixels()):
-        strip.setPixelColor(i, color[i])
-    strip.show()
-    sleep(wait_ms / 1000.0)
-
-
-def random_color():
-    """Random color generator."""
-    return [int(255 * x) for x in hls_to_rgb(random(), 0.5, 1)]
-
-
-def save_pixels(strip):
-    """Saves current pixel colors"""
-    return [strip.getPixelColor(i) for i in range(strip.numPixels())]
-
-
-def wheel(pos):
+def rainbow_wheel(pos):
     """Generate rainbow colors across 0-255 positions."""
     if pos < 85:
         return Color(pos * 3, 255 - pos * 3, 0)
@@ -93,3 +75,21 @@ def wheel(pos):
     else:
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
+
+
+def random_color():
+    """Random color generator."""
+    return [int(255 * x) for x in hls_to_rgb(random(), 0.5, 1)]
+
+
+def save_pixels(strip):
+    """Saves current pixel colors."""
+    return [strip.getPixelColor(i) for i in range(strip.numPixels())]
+
+
+def static_color_array(strip, color, wait_ms=0):
+    """Instantly switches color from an array of colors."""
+    for i in range(strip.numPixels()):
+        strip.setPixelColor(i, color[i])
+    strip.show()
+    sleep(wait_ms / 1000.0)
