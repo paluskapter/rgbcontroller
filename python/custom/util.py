@@ -36,6 +36,35 @@ def gradient_color(pos, c1, c2, pixels):
     return Color(r, g, b)
 
 
+def gradient_rainbow():
+    """Returns an iterator with all the rainbow colors."""
+    r = 255
+    g = 0
+    b = 0
+
+    yield Color(r, g, b)
+
+    while True:
+        for i in range(255):
+            g += 1
+            yield Color(r, g, b)
+        for i in range(255):
+            r -= 1
+            yield Color(r, g, b)
+        for i in range(255):
+            b += 1
+            yield Color(r, g, b)
+        for i in range(255):
+            g -= 1
+            yield Color(r, g, b)
+        for i in range(255):
+            r += 1
+            yield Color(r, g, b)
+        for i in range(255):
+            b -= 1
+            yield Color(r, g, b)
+
+
 def instant_color_array(strip, color, wait_ms=0):
     """Instantly switches color from an array of colors."""
     for i in range(strip.numPixels()):

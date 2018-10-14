@@ -80,6 +80,12 @@ def snake():
     return 'snake'
 
 
+@app.route('/snake_gradient')
+def snake_gradient():
+    start_process(rgb.snake_gradient)
+    return 'snake_gradient'
+
+
 @app.route('/snake_rainbow')
 def snake_rainbow():
     start_process(rgb.snake_rainbow)
