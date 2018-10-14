@@ -169,7 +169,7 @@ class RGBController:
             r, g, b = random_color()
             self.static_color(r, g, b, wait_ms)
 
-    def static_voltage_drop(self):
+    def voltage_drop(self):
         """Voltage drop effect (white to orange)"""
         self.static_gradient((255, 255, 255), (255, 50, 0))
 

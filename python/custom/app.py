@@ -98,12 +98,6 @@ def gradient(r1, g1, b1, r2, g2, b2):
     return 'static_gradient'
 
 
-@app.route('/static_voltage_drop')
-def static_voltage_drop():
-    rgb.static_voltage_drop()
-    return 'static_voltage_drop'
-
-
 @app.route('/strobe/<wait>')
 def strobe(wait):
     try:
@@ -111,6 +105,12 @@ def strobe(wait):
     except ValueError:
         rgb.show_error()
     return 'strobe'
+
+
+@app.route('/voltage_drop')
+def voltage_drop():
+    rgb.voltage_drop()
+    return 'voltage_drop'
 
 
 def start_process(func, args=()):
