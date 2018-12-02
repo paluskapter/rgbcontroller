@@ -26,6 +26,7 @@ class RGBController:
 
     def clear(self):
         """Clears the strip one by one."""
+        # TODO: Save actual color from other processes as well!
         self.static_color(16, 16, 16)
         color_wipe(self.strip, Color(0, 0, 0))
 
@@ -43,11 +44,6 @@ class RGBController:
 
             self.strip.show()
             sleep(randint(100, 200) / 1000.0)
-
-    def music(self):
-        """Lights according to music."""
-        # TODO: Implement
-        pass
 
     def rainbow(self, wait_ms=0):
         """Whole rainbow moves across the strip."""
@@ -97,12 +93,12 @@ class RGBController:
                     old_b = (old_b - 1) if dist_b > 0 else old_b + 1
                 self.static_color(old_r, old_g, old_b, 10)
 
-    def snake(self, method=1):
+    def snake(self, method="color"):
         """
-        Snake implementation. Methods:
-        1 = color
-        2 = fade
-        3 = rainbow
+        Snake implementation for all 3 methods:
+        color: Snake with changing color.
+        fade: Snake with continuously changing color.
+        rainbow: Snake with the whole rainbow.
         """
         start = 0
         length = 48
@@ -122,7 +118,8 @@ class RGBController:
                 self.strip.setPixelColor(i, Color(0, 0, 0))
 
             for i in range(start, start + length):
-                color = normal_color if method == 1 else fade_color if method == 2 else RAINBOW[(i - start) / 4]
+                color = normal_color if method == "color" else fade_color if method == "fade" else RAINBOW[
+                    (i - start) / 4]
                 self.strip.setPixelColor(i, color)
 
             if direction:
@@ -133,21 +130,12 @@ class RGBController:
             self.strip.show()
             sleep(0.01)
 
-    def snake_color(self):
-        """Snake with changing color."""
-        self.snake(1)
-
-    def snake_fade(self):
-        """Snake with continuously changing color."""
-        self.snake(2)
-
-    def snake_rainbow(self):
-        """Snake with the whole rainbow."""
-        self.snake(3)
-
     def static_color(self, r, g, b, wait_ms=0):
         """Switches color of the whole strip."""
-        static_color_array(self.strip, [Color(r, g, b)] * self.strip.numPixels(), wait_ms)
+        if 0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255:
+            static_color_array(self.strip, [Color(r, g, b)] * self.strip.numPixels(), wait_ms)
+        else:
+            self.show_error()
 
     def static_color_name(self, name, wait_ms=0):
         """Switches color of the whole strip by name."""
@@ -159,19 +147,18 @@ class RGBController:
 
     def static_gradient(self, c1, c2):
         """Gradient between 2 colors."""
-        for i in range(self.strip.numPixels()):
-            self.strip.setPixelColor(i, gradient_color(i, c1, c2, self.strip.numPixels()))
-        self.strip.show()
+        if all([0 <= i <= 255 and 0 <= j <= 255 for i in c1 for j in c2]):
+            for i in range(self.strip.numPixels()):
+                self.strip.setPixelColor(i, gradient_color(i, c1, c2, self.strip.numPixels()))
+            self.strip.show()
+        else:
+            self.show_error()
 
-    def strobe(self, wait_ms):
+    def strobe(self, wait_ms=300):
         """Strobe effect."""
         while True:
             r, g, b = random_color()
             self.static_color(r, g, b, wait_ms)
-
-    def voltage_drop(self):
-        """Voltage drop effect (white to orange)"""
-        self.static_gradient((255, 255, 255), (255, 50, 0))
 
     def show_error(self):
         """Flashes red twice."""

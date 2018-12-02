@@ -1,4 +1,4 @@
-import multiprocessing as mp
+from multiprocessing import Process
 
 from flask import Flask
 
@@ -16,7 +16,7 @@ def index():
 
 @app.route('/clear')
 def clear():
-    rgb.clear()
+    start_process(rgb.clear)
     return 'clear'
 
 
@@ -26,15 +26,10 @@ def fire():
     return 'fire'
 
 
-@app.route('/music')
-def music():
-    start_process(rgb.music)
-    return 'music'
-
-
 @app.route('/rainbow')
-def rainbow():
-    start_process(rgb.rainbow)
+@app.route('/rainbow/<int:wait_ms>')
+def rainbow(wait_ms=0):
+    start_process(rgb.rainbow, (wait_ms,))
     return 'rainbow'
 
 
@@ -58,28 +53,25 @@ def random_fade():
 
 @app.route('/snake_color')
 def snake_color():
-    start_process(rgb.snake_color)
+    start_process(rgb.snake, ("color",))
     return 'snake_color'
 
 
 @app.route('/snake_fade')
 def snake_fade():
-    start_process(rgb.snake_fade)
+    start_process(rgb.snake, ("fade",))
     return 'snake_fade'
 
 
 @app.route('/snake_rainbow')
 def snake_rainbow():
-    start_process(rgb.snake_rainbow)
+    start_process(rgb.snake, ("rainbow",))
     return 'snake_rainbow'
 
 
-@app.route('/static_color/<red>/<green>/<blue>')
+@app.route('/static_color/<int:red>/<int:green>/<int:blue>')
 def static_color(red, green, blue):
-    try:
-        rgb.static_color(int(red), int(green), int(blue))
-    except ValueError:
-        rgb.show_error()
+    rgb.static_color(red, green, blue)
     return 'static_color'
 
 
@@ -89,33 +81,22 @@ def static_color_name(name):
     return 'static_color_name'
 
 
-@app.route('/static_gradient/<r1>/<g1>/<b1>/<r2>/<g2>/<b2>')
-def gradient(r1, g1, b1, r2, g2, b2):
-    try:
-        rgb.static_gradient((int(r1), int(g1), int(b1)), (int(r2), int(g2), int(b2)))
-    except ValueError:
-        rgb.show_error()
+@app.route('/static_gradient/<int:r1>/<int:g1>/<int:b1>/<int:r2>/<int:g2>/<int:b2>')
+def static_gradient(r1, g1, b1, r2, g2, b2):
+    rgb.static_gradient((r1, g1, b1), (r2, g2, b2))
     return 'static_gradient'
 
 
-@app.route('/strobe/<wait>')
-def strobe(wait):
-    try:
-        start_process(rgb.strobe, (int(wait),))
-    except ValueError:
-        rgb.show_error()
+@app.route('/strobe')
+@app.route('/strobe/<int:wait_ms>')
+def strobe(wait_ms=300):
+    start_process(rgb.strobe, (wait_ms,))
     return 'strobe'
-
-
-@app.route('/voltage_drop')
-def voltage_drop():
-    rgb.voltage_drop()
-    return 'voltage_drop'
 
 
 def start_process(func, args=()):
     global proc
-    proc = mp.Process(target=func, args=args)
+    proc = Process(target=func, args=args)
     proc.start()
 
 
@@ -129,5 +110,3 @@ def stop_process():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-
-# TODO: Voice commands
