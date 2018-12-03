@@ -24,13 +24,12 @@ class RGBController:
                                        LED_BRIGHTNESS, LED_CHANNEL, STRIP_TYPE)
         self.strip.begin()
 
-    def clear(self):
+    def clear(self, state):
         """Clears the strip one by one."""
-        # TODO: Save actual color from other processes as well!
-        self.static_color(16, 16, 16)
-        color_wipe(self.strip, Color(0, 0, 0))
+        static_color_array(self.strip, state[0]['colors'])
+        self.color_wipe(state, Color(0, 0, 0))
 
-    def fire(self):
+    def fire(self, state):
         """Fire effect."""
         while True:
             for i in range(40) + range(self.strip.numPixels() - 25, self.strip.numPixels()):
@@ -43,30 +42,33 @@ class RGBController:
                     0))
 
             self.strip.show()
+            self.save_state(state, save_pixels(self.strip))
             sleep(randint(100, 200) / 1000.0)
 
-    def rainbow(self, wait_ms=0):
+    def rainbow(self, state, wait_ms=0):
         """Whole rainbow moves across the strip."""
         while True:
             for j in range(256):
                 for i in range(self.strip.numPixels()):
                     self.strip.setPixelColor(i, rainbow_wheel((i + j) & 255))
                 self.strip.show()
+                self.save_state(state, save_pixels(self.strip))
                 sleep(wait_ms / 1000.0)
 
-    def rainbow_color_wipe(self):
+    def rainbow_color_wipe(self, state):
         """Wipe 12 colors across display a pixel at a time."""
         for color in itertools.cycle(RAINBOW):
-            color_wipe(self.strip, color, 10)
+            self.color_wipe(state, color, 10)
 
-    def rainbow_fade(self):
+    def rainbow_fade(self, state):
         """Fades between all the colors in the rainbow."""
         color_generator = rainbow_color_generator()
         while True:
             c = color_generator.next()
             self.static_color(c[0], c[1], c[2], 10)
+            self.save_state(state, save_pixels(self.strip))
 
-    def random_fade(self):
+    def random_fade(self, state):
         """Randomly fades between colors."""
         old_r, old_g, old_b = random_color()
         self.static_color(old_r, old_g, old_b)
@@ -92,8 +94,9 @@ class RGBController:
                 if i % step_b < 1:
                     old_b = (old_b - 1) if dist_b > 0 else old_b + 1
                 self.static_color(old_r, old_g, old_b, 10)
+                self.save_state(state, save_pixels(self.strip))
 
-    def snake(self, method="color"):
+    def snake(self, state, method="color"):
         """
         Snake implementation for all 3 methods:
         color: Snake with changing color.
@@ -128,6 +131,7 @@ class RGBController:
                 start -= 1
 
             self.strip.show()
+            self.save_state(state, save_pixels(self.strip))
             sleep(0.01)
 
     def static_color(self, r, g, b, wait_ms=0):
@@ -154,11 +158,26 @@ class RGBController:
         else:
             self.show_error()
 
-    def strobe(self, wait_ms=300):
+    def strobe(self, state, wait_ms=300):
         """Strobe effect."""
         while True:
             r, g, b = random_color()
             self.static_color(r, g, b, wait_ms)
+            self.save_state(state, save_pixels(self.strip))
+
+    def color_wipe(self, state, color, wait_ms=0):
+        """Wipe color across display a pixel at a time."""
+        for i in range(self.strip.numPixels()):
+            self.strip.setPixelColor(i, color)
+            self.strip.show()
+            self.save_state(state, save_pixels(self.strip))
+            sleep(wait_ms / 1000.0)
+
+    def save_state(self, state, colors):
+        """Saves the state of the strip between processes."""
+        d = state[0]
+        d['colors'] = colors
+        state[0] = d
 
     def show_error(self):
         """Flashes red twice."""

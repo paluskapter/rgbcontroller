@@ -20,14 +20,6 @@ RAINBOW = [
 ]
 
 
-def color_wipe(strip, color, wait_ms=0):
-    """Wipe color across display a pixel at a time."""
-    for i in range(strip.numPixels()):
-        strip.setPixelColor(i, color)
-        strip.show()
-        sleep(wait_ms / 1000.0)
-
-
 def gradient_color(pos, c1, c2, pixels):
     """Calculates the color for a given pixel in a gradient effect."""
     return Color(

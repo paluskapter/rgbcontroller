@@ -1,4 +1,5 @@
 from multiprocessing import Process
+from multiprocessing.managers import SyncManager
 
 from flask import Flask
 
@@ -7,6 +8,11 @@ from control import RGBController
 app = Flask(__name__)
 rgb = RGBController()
 proc = None
+
+manager = SyncManager()
+manager.start()
+state = manager.list()
+state.append({})
 
 
 @app.route('/')
@@ -95,8 +101,8 @@ def strobe(wait_ms=300):
 
 
 def start_process(func, args=()):
-    global proc
-    proc = Process(target=func, args=args)
+    global proc, state
+    proc = Process(target=func, args=(state,) + args)
     proc.start()
 
 
