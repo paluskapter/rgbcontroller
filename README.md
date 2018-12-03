@@ -1,6 +1,12 @@
 rpi_ws281x
 ==========
 
+### IMPORTANT:
+
+This project is a fork of [jgarff/rpi_ws281x](https://github.com/jgarff/rpi_ws281x), all the custom functionality is in the [custom folder](https://github.com/paluskapter/rpi_ws281x/tree/master/python/custom).
+
+---
+
 Userspace Raspberry Pi library for controlling WS281X LEDs.
 This includes WS2812 and SK6812RGB RGB LEDs
 Preliminary support is now included for SK6812RGBW LEDs (yes, RGB + W)
