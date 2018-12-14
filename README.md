@@ -5,6 +5,12 @@ rpi_ws281x
 
 This project is a fork of [jgarff/rpi_ws281x](https://github.com/jgarff/rpi_ws281x), all the custom functionality is in the [custom folder](https://github.com/paluskapter/rgbcontroller/tree/master/python/custom).
 
+[The first version](https://github.com/paluskapter/rgbcontroller/releases/tag/1.0.0) used a simple webserver as the API.
+
+However, to use it from outside the local network, a DNS service must be registered for the dynamic IP and also incoming communications must be allowed to the Pi, which can be a security risk.
+
+Version 2 polls AWS SQS for instructions to avoid the above problems.
+
 ---
 
 Userspace Raspberry Pi library for controlling WS281X LEDs.
