@@ -3,7 +3,7 @@ rpi_ws281x
 
 ### IMPORTANT:
 
-This project is a fork of [jgarff/rpi_ws281x](https://github.com/jgarff/rpi_ws281x), all the custom functionality is in the [custom folder](https://github.com/paluskapter/rpi_ws281x/tree/master/python/custom).
+This project is a fork of [jgarff/rpi_ws281x](https://github.com/jgarff/rpi_ws281x), all the custom functionality is in the [custom folder](https://github.com/paluskapter/rgbcontroller/tree/master/python/custom).
 
 ---
 
