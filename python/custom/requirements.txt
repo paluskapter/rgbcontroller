@@ -1,2 +1,3 @@
 webcolors
 flask
+boto3

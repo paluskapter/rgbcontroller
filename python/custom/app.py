@@ -1,6 +1,9 @@
+import os
+import urllib2
 from multiprocessing import Process
 from multiprocessing.managers import SyncManager
 
+import boto3
 from flask import Flask
 
 from control import RGBController
@@ -114,5 +117,38 @@ def stop_process():
         proc.join()
 
 
+def sqsreader():
+    client = boto3.client('sqs')
+    url = os.environ['SQS_URL']
+
+    while True:
+        response = client.receive_message(
+            QueueUrl=url,
+            AttributeNames=[],
+            MessageAttributeNames=[],
+            MaxNumberOfMessages=1,
+            VisibilityTimeout=30,
+            WaitTimeSeconds=20
+        )
+
+        if 'Messages' in response:
+            message = response['Messages'][0]
+            path = message['Body']
+
+            try:
+                urllib2.urlopen("http://localhost:5000/" + path).read()
+            except urllib2.HTTPError:
+                pass
+
+            client.delete_message(
+                QueueUrl=url,
+                ReceiptHandle=message['ReceiptHandle']
+            )
+
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    if "SQS" in os.environ:
+        sqsr = Process(target=sqsreader, args=())
+        sqsr.start()
+
+    app.run(debug=True, host='0.0.0.0', port=5000)
