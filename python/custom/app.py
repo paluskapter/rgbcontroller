@@ -121,32 +121,36 @@ def stop_process():
 
 
 def sqs_reader():
-    client = boto3.client('sqs')
-    url = os.environ['SQS_URL']
-
     while True:
-        response = client.receive_message(
-            QueueUrl=url,
-            AttributeNames=[],
-            MessageAttributeNames=[],
-            MaxNumberOfMessages=1,
-            VisibilityTimeout=30,
-            WaitTimeSeconds=20
-        )
+        try:
+            client = boto3.client('sqs')
+            url = os.environ['SQS_URL']
 
-        if 'Messages' in response:
-            message = response['Messages'][0]
-            path = message['Body']
+            while True:
+                response = client.receive_message(
+                    QueueUrl=url,
+                    AttributeNames=[],
+                    MessageAttributeNames=[],
+                    MaxNumberOfMessages=1,
+                    VisibilityTimeout=30,
+                    WaitTimeSeconds=20
+                )
 
-            try:
-                urllib2.urlopen("http://localhost:" + str(port) + "/" + path).read()
-            except urllib2.HTTPError:
-                pass
+                if 'Messages' in response:
+                    message = response['Messages'][0]
+                    path = message['Body']
 
-            client.delete_message(
-                QueueUrl=url,
-                ReceiptHandle=message['ReceiptHandle']
-            )
+                    try:
+                        urllib2.urlopen("http://localhost:" + str(port) + "/" + path).read()
+                    except urllib2.HTTPError:
+                        pass
+
+                    client.delete_message(
+                        QueueUrl=url,
+                        ReceiptHandle=message['ReceiptHandle']
+                    )
+        except Exception:
+            pass
 
 
 if __name__ == '__main__':
