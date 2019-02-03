@@ -60,12 +60,14 @@ class RGBController:
         for color in itertools.cycle(RAINBOW):
             self.color_wipe(state, color, 10)
 
-    def rainbow_fade(self, state):
+    def rainbow_fade(self, state, brightness=255):
         """Fades between all the colors in the rainbow."""
-        color_generator = rainbow_color_generator()
+        color_generator = rainbow_color_generator(brightness)
+        wait = int((-1 / 5.0 * brightness) + 50) if brightness <= 200 else 10
+
         while True:
             c = color_generator.next()
-            self.static_color(c[0], c[1], c[2], 10)
+            self.static_color(c[0], c[1], c[2], wait)
             self.save_state(state, save_pixels(self.strip))
 
     def random_fade(self, state):

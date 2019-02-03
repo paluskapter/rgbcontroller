@@ -28,31 +28,31 @@ def gradient_color(pos, c1, c2, pixels):
         int(pos * (c2[2] - c1[2]) / pixels + float(c1[2])))
 
 
-def rainbow_color_generator():
+def rainbow_color_generator(brightness):
     """Returns an iterator with all the rainbow colors."""
-    r = 255
+    r = brightness
     g = 0
     b = 0
 
     yield (r, g, b)
 
     while True:
-        for i in range(255):
+        for i in range(brightness):
             g += 1
             yield (r, g, b)
-        for i in range(255):
+        for i in range(brightness):
             r -= 1
             yield (r, g, b)
-        for i in range(255):
+        for i in range(brightness):
             b += 1
             yield (r, g, b)
-        for i in range(255):
+        for i in range(brightness):
             g -= 1
             yield (r, g, b)
-        for i in range(255):
+        for i in range(brightness):
             r += 1
             yield (r, g, b)
-        for i in range(255):
+        for i in range(brightness):
             b -= 1
             yield (r, g, b)
 
